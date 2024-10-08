@@ -171,6 +171,41 @@ void Camera::releaseMouse( int x, int y )
 	mCurrentMouseAction = kActionNone;
 }
 
+void Camera::lookAt(Vec3f eye, Vec3f at, Vec3f up) {
+	Vec3f forward = at - eye;
+	forward.normalize();
+
+	Vec3f right = forward ^ up;
+	right.normalize();
+
+	Vec3f upNew = right ^ forward;
+
+	Mat4f viewMatrix;
+	viewMatrix[0][0] = right[0];
+	viewMatrix[1][0] = right[1];
+	viewMatrix[2][0] = right[2];
+	viewMatrix[3][0] = 0.0f;
+
+	viewMatrix[0][1] = upNew[0];
+	viewMatrix[1][1] = upNew[1];
+	viewMatrix[2][1] = upNew[2];
+	viewMatrix[3][1] = 0.0f;
+
+	viewMatrix[0][2] = -forward[0];
+	viewMatrix[1][2] = -forward[1];
+	viewMatrix[2][2] = -forward[2];
+	viewMatrix[3][2] = 0.0f;
+
+	viewMatrix[0][3] = 0.0f;
+	viewMatrix[1][3] = 0.0f;
+	viewMatrix[2][3] = 0.0f;
+	viewMatrix[3][3] = 1.0f;
+
+	glMultMatrixf(&viewMatrix[0][0]);
+
+	glTranslated(-eye[0], -eye[1], -eye[2]);
+}
+
 
 void Camera::applyViewingTransform() {
 	if( mDirtyTransform )
@@ -178,9 +213,8 @@ void Camera::applyViewingTransform() {
 
 	// Place the camera at mPosition, aim the camera at
 	// mLookAt, and twist the camera such that mUpVector is up
-	gluLookAt(	mPosition[0], mPosition[1], mPosition[2],
-				mLookAt[0],   mLookAt[1],   mLookAt[2],
-				mUpVector[0], mUpVector[1], mUpVector[2]);
+	lookAt(mPosition, mLookAt, mUpVector);
+	
 }
 
 #pragma warning(pop)
