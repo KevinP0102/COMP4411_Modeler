@@ -16,6 +16,11 @@ enum RobotCtrls {
 	TOTAL
 };
 
+static GLfloat lightPosition2[] = { -20, -20, -20, 0 };
+static GLfloat lightDiffuse2[] = { 1,1,1,0.5 };
+static GLfloat lightAmbient2[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+static GLint angleInc = 0;
+
 class Robot : public ModelerView {
 public:
 	Robot(int x, int y, int w, int h, char* label) 
@@ -31,6 +36,20 @@ ModelerView* createRobot(int x, int y, int w, int h, char* label) {
 void Robot::draw()
 {
 	ModelerView::draw();
+
+	glEnable(GL_LIGHT2);
+
+	glLightfv(GL_LIGHT2, GL_POSITION, lightPosition2);
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, lightDiffuse2);
+	glLightfv(GL_LIGHT2, GL_AMBIENT, lightAmbient2);
+
+	
+	if (angleInc == 360) {
+		angleInc = 0;
+	}
+	else {
+		angleInc += 3;
+	}
 
 	setAmbientColor(.1f, .1f, .1f);
 	setDiffuseColor(COLOR_GREEN);
@@ -72,12 +91,12 @@ void Robot::draw()
 				drawCylinder(0.4 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT));
 
 					glPushMatrix();
-					glTranslated(0, 0.07 * VAL(BODYHEIGHT), 0.4 * VAL(BODYHEIGHT));
+					glTranslated(0, 0.06 * VAL(BODYHEIGHT), 0.4 * VAL(BODYHEIGHT));
 	
 					setAmbientColor(.1f, .1f, .1f);
 					setDiffuseColor(COLOR_GREEN);
 					glRotated(90, 1, 0, 0);
-					drawCylinder(0.12 * VAL(BODYHEIGHT), 0.07 * VAL(BODYHEIGHT), 0.07 * VAL(BODYHEIGHT));
+					drawCylinder(0.12 * VAL(BODYHEIGHT), 0.09 * VAL(BODYHEIGHT), 0.09 * VAL(BODYHEIGHT));
 
 					glPopMatrix();
 
@@ -114,12 +133,12 @@ void Robot::draw()
 				drawCylinder(0.4 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT));
 
 					glPushMatrix();
-					glTranslated(0, 0.07*VAL(BODYHEIGHT), 0.4 * VAL(BODYHEIGHT));
+					glTranslated(0, 0.06 * VAL(BODYHEIGHT), 0.4 * VAL(BODYHEIGHT));
 
 					setAmbientColor(.1f, .1f, .1f);
 					setDiffuseColor(COLOR_GREEN);
 					glRotated(90, 1, 0, 0);
-					drawCylinder(0.12 * VAL(BODYHEIGHT), 0.07 * VAL(BODYHEIGHT), 0.07 * VAL(BODYHEIGHT));
+					drawCylinder(0.12 * VAL(BODYHEIGHT), 0.09 * VAL(BODYHEIGHT), 0.09 * VAL(BODYHEIGHT));
 
 					glPopMatrix();
 
