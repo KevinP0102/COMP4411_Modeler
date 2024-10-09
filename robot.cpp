@@ -204,6 +204,24 @@ void Robot::draw()
 
 			glPopMatrix();
 
+			
+			glPushMatrix();
+
+			setAmbientColor(.1f, .1f, .1f);
+			setDiffuseColor(.5f, .5f, .5f);
+			glTranslated(0, -VAL(BODYWIDTH), VAL(BODYHEIGHT)/2.0f);
+			glRotated(90, 1, 0, 0);
+			glRotated(angleInc, 0, 0, 1);
+			drawCylinder(VAL(BODYWIDTH)*0.25, 0.075 * VAL(BODYWIDTH), 0.075 * VAL(BODYWIDTH));
+
+				glPushMatrix();
+				glTranslated(-VAL(BODYWIDTH)*0.075, -VAL(BODYWIDTH) * 0.25, VAL(BODYWIDTH) * 0.25);
+				drawBox(0.15 * VAL(BODYWIDTH), VAL(BODYWIDTH)*0.5, VAL(BODYWIDTH)*0.2);
+				glPopMatrix();
+
+			glPopMatrix();
+
+
 		glPopMatrix();
 
 	glPopMatrix();
