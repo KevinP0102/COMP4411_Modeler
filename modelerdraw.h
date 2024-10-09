@@ -86,6 +86,10 @@ void drawBox( double x, double y, double z );
 // Draw an axis-aligned texture box from origin to (x,y,z)
 void drawTextureBox( double x, double y, double z );
 
+void drawTextureCylinder(double h, double r1, double r2);
+
+void loadTexture();
+
 // Draw a cylinder from z=0 to z=h with radius r1 at origin and r2 at z=h
 void drawCylinder( double h, double r1, double r2 );
 

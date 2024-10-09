@@ -3,6 +3,11 @@
 #include <GL/glu.h>
 #include <cstdio>
 #include <math.h>
+#include "modelerui.h"
+
+static GLuint textureID;
+static int width, height;
+static unsigned char* texture;
 
 // ********************************************************
 // Support functions from previous version of modeler
@@ -378,6 +383,33 @@ void drawCylinder( double h, double r1, double r2 )
     }
     
 }
+
+void drawTextureCylinder(double h, double r1, double r2)
+{
+    
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glEnable(GL_TEXTURE_2D);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    drawCylinder(h, r1, r2);
+
+    glDisable(GL_TEXTURE_2D);
+}
+
+void loadTexture() {
+    delete[] texture;
+    char* filename = NULL;
+    filename = fl_file_chooser("Open Texture?", "*.bmp", NULL);
+	texture = readBMP(filename, width, height);
+	glGenTextures(1, &textureID);
+
+}
+
 void drawTriangle( double x1, double y1, double z1,
                    double x2, double y2, double z2,
                    double x3, double y3, double z3 )

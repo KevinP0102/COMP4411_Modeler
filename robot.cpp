@@ -1,12 +1,15 @@
 #include "modelerview.h"
 #include "modelerapp.h"
+#include "modelerui.h"
 #include "modelerdraw.h"
 #include <FL/gl.h>
+#include <FL/glu.h>
+#include "vec.h"
+#include "bitmap.h"
 
 #include "modelerglobals.h"
 
 enum RobotCtrls {
-	X, Y, Z, 
 	BODYHEIGHT, BODYWIDTH, NECKHEIGHT, HEADSCALE, 
 	LEFTARM1X, LEFTARM1Y, LEFTARM1Z, LEFTARM2X, LEFTARM2Y, LEFTARM2Z,
 	RIGHTARM1X, RIGHTARM1Y, RIGHTARM1Z, RIGHTARM2X, RIGHTARM2Y, RIGHTARM2Z,
@@ -26,11 +29,50 @@ public:
 	Robot(int x, int y, int w, int h, char* label) 
 		: ModelerView(x, y, w, h, label) {}
 
+	void drawPentagonalBipyramid();
+
 	virtual void draw();
 };
 
 ModelerView* createRobot(int x, int y, int w, int h, char* label) {
 	return new Robot(x, y, w, h, label);
+}
+
+void Robot::drawPentagonalBipyramid() {
+	Vec3f top = Vec3f(0, 0, 1);
+	Vec3f bottom = Vec3f(0, 0, -1);
+	Vec3f square1 = Vec3f(1, 0, 0);
+	Vec3f square2 = Vec3f(0, 1, 0);
+	Vec3f square3 = Vec3f(-1, 0, 0);
+	Vec3f square4 = Vec3f(0, -1, 0);
+
+	drawTriangle(square1[0], square1[1], square1[2],
+		square2[0], square2[1], square2[2],
+		top[0], top[1], top[2]);
+	drawTriangle(square2[0], square2[1], square2[2],
+		square3[0], square3[1], square3[2],
+		top[0], top[1], top[2]);
+	drawTriangle(square3[0], square3[1], square3[2],
+		square4[0], square4[1], square4[2],
+		top[0], top[1], top[2]);
+	drawTriangle(square4[0], square4[1], square4[2],
+		square1[0], square1[1], square1[2],
+		top[0], top[1], top[2]);
+
+	drawTriangle(square1[0], square1[1], square1[2],
+		square2[0], square2[1], square2[2],
+		bottom[0], bottom[1], bottom[2]);
+	drawTriangle(square2[0], square2[1], square2[2],
+		square3[0], square3[1], square3[2],
+		bottom[0], bottom[1], bottom[2]);
+	drawTriangle(square3[0], square3[1], square3[2],
+		square4[0], square4[1], square4[2],
+		bottom[0], bottom[1], bottom[2]);
+	drawTriangle(square4[0], square4[1], square4[2],
+		square1[0], square1[1], square1[2],
+		bottom[0], bottom[1], bottom[2]);
+
+
 }
 
 void Robot::draw()
@@ -55,12 +97,12 @@ void Robot::draw()
 	setDiffuseColor(COLOR_GREEN);
 
 	glPushMatrix();
-		glTranslated(VAL(X), VAL(Y), VAL(Z));
+		glTranslated(0, 0, 0);
 
 		glPushMatrix();
 		glTranslated(0, 1, 0);
 		glRotated(90, 1, 0, 0);
-		drawCylinder(VAL(BODYHEIGHT), VAL(BODYWIDTH), VAL(BODYWIDTH));
+		drawTextureCylinder(VAL(BODYHEIGHT), VAL(BODYWIDTH), VAL(BODYWIDTH));
 			
 			setAmbientColor(.1f, .1f, .1f);
 			setDiffuseColor(COLOR_RED);
@@ -132,6 +174,7 @@ void Robot::draw()
 				glRotated(VAL(RIGHTARM2Z), 0, 0, 1);
 				drawCylinder(0.4 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT));
 
+					
 					glPushMatrix();
 					glTranslated(0, 0.06 * VAL(BODYHEIGHT), 0.4 * VAL(BODYHEIGHT));
 
@@ -141,6 +184,7 @@ void Robot::draw()
 					drawCylinder(0.12 * VAL(BODYHEIGHT), 0.09 * VAL(BODYHEIGHT), 0.09 * VAL(BODYHEIGHT));
 
 					glPopMatrix();
+
 
 				glPopMatrix();
 
@@ -154,6 +198,12 @@ void Robot::draw()
 				glTranslated(-VAL(HEADSCALE) /2.0, -VAL(HEADSCALE) / 4.0, VAL(NECKHEIGHT));
 				glScaled(VAL(HEADSCALE), VAL(HEADSCALE)/2.0, VAL(HEADSCALE)/2.0);
 				drawBox(1, 1, 1);
+				glPopMatrix();
+
+				glPushMatrix();
+				glTranslated(0, 0, VAL(NECKHEIGHT) + VAL(HEADSCALE));
+				glScaled(0.5, 0.5, 0.5);
+				drawPentagonalBipyramid();
 				glPopMatrix();
 
 			glPopMatrix();
@@ -229,9 +279,6 @@ void Robot::draw()
 
 int main() {
 	ModelerControl controls[TOTAL];
-	controls[X] = ModelerControl("X Position", -5, 5, 1, 0);
-	controls[Y] = ModelerControl("Y Position", -5, 5, 1, 0);
-	controls[Z] = ModelerControl("Z Position", -5, 5, 1, 0);
 	controls[BODYHEIGHT] = ModelerControl("Body Height", 1.5f, 4.5f, 0.1f, 3.0f);
 	controls[BODYWIDTH] = ModelerControl("Body Width", 1.0f, 2.0f, 0.1f, 1.3f);
 	controls[NECKHEIGHT] = ModelerControl("Neck Height", 0.1f, 0.5f, 0.1f, 0.3f);
@@ -260,5 +307,7 @@ int main() {
 	
 
 	ModelerApplication::Instance()->Init(&createRobot, controls, TOTAL);
+	loadTexture();
+
 	return ModelerApplication::Instance()->Run();
 }
