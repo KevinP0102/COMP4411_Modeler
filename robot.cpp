@@ -16,8 +16,16 @@ enum RobotCtrls {
 	LEFTLEGX, LEFTLEGY, LEFTLEGZ, 
 	RIGHTLEGX, RIGHTLEGY, RIGHTLEGZ,
 	BOTHLEGSX, BOTHLEGSY, BOTHLEGSZ,
+	HEADTYPE, HANDTYPE, FOOTTYPE,
+	HEADCOLOR, HANDCOLOR, FOOTCOLOR,
 	TOTAL
 };
+
+#define COLOR_WHITE 1.0f, 1.0f, 1.0f
+#define COLOR_ORANGE 1.0f, 0.5f, 0.0f
+#define COLOR_YELLOW 1.0f, 1.0f, 0.0f
+#define COLOR_LIGHT_BLUE 0.0f, 1.0f, 1.0f
+#define COLOR_GREY 0.5f, 0.5f, 0.5f
 
 static GLfloat lightPosition2[] = { -20, -20, -20, 0 };
 static GLfloat lightDiffuse2[] = { 1,1,1,0.5 };
@@ -102,8 +110,10 @@ void Robot::draw()
 		glPushMatrix();
 		glTranslated(0, 1, 0);
 		glRotated(90, 1, 0, 0);
+		//body
 		drawTextureCylinder(VAL(BODYHEIGHT), VAL(BODYWIDTH), VAL(BODYWIDTH));
 			
+		//left arm 1
 			setAmbientColor(.1f, .1f, .1f);
 			setDiffuseColor(COLOR_RED);
 			glPushMatrix();
@@ -111,12 +121,13 @@ void Robot::draw()
 			drawSphere(0.075 * VAL(BODYHEIGHT));
 
 			setAmbientColor(.1f, .1f, .1f);
-			setDiffuseColor(COLOR_BLUE);
+			setDiffuseColor(COLOR_WHITE);
 			glRotated(30, 0, 1, 0);
 			glRotated(VAL(LEFTARM1X), 1, 0, 0);
 			glRotated(VAL(LEFTARM1Y), 0, 1, 0);
 			glRotated(VAL(LEFTARM1Z), 0, 0, 1);
 			drawCylinder(0.4 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT));
+			//left arm 2
 
 				glPushMatrix();
 				glTranslated(0, 0, 0.4 * VAL(BODYHEIGHT));
@@ -125,27 +136,49 @@ void Robot::draw()
 				drawSphere(0.075 * VAL(BODYHEIGHT));
 
 				setAmbientColor(.1f, .1f, .1f);
-				setDiffuseColor(COLOR_BLUE);
+				setDiffuseColor(COLOR_WHITE);
 				glRotated(-30, 0, 1, 0);
 				glRotated(VAL(LEFTARM2X), 1, 0, 0);
 				glRotated(VAL(LEFTARM2Y), 0, 1, 0);
 				glRotated(VAL(LEFTARM2Z), 0, 0, 1);
 				drawCylinder(0.4 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT));
-
+				//hand
+				if (VAL(HANDTYPE) == 0) {
 					glPushMatrix();
 					glTranslated(0, 0.06 * VAL(BODYHEIGHT), 0.4 * VAL(BODYHEIGHT));
-	
-					setAmbientColor(.1f, .1f, .1f);
-					setDiffuseColor(COLOR_GREEN);
+
+					
+					if (VAL(HANDCOLOR) == 0)
+						setDiffuseColor(COLOR_ORANGE);
+					else if (VAL(HANDCOLOR) == 1)
+						setDiffuseColor(COLOR_LIGHT_BLUE);
+					
 					glRotated(90, 1, 0, 0);
 					drawCylinder(0.12 * VAL(BODYHEIGHT), 0.09 * VAL(BODYHEIGHT), 0.09 * VAL(BODYHEIGHT));
 
 					glPopMatrix();
+				}
+				else
+				{
+					glPushMatrix();
+					glTranslated(-0.075 * VAL(BODYHEIGHT), -0.075*VAL(BODYHEIGHT), (0.4 - 0.075) * VAL(BODYHEIGHT));
 
+					setAmbientColor(.1f, .1f, .1f);
+					if (VAL(HANDCOLOR) == 0)
+						setDiffuseColor(COLOR_ORANGE);
+					else if (VAL(HANDCOLOR) == 1)
+						setDiffuseColor(COLOR_LIGHT_BLUE);
+
+					glScaled(0.15 * VAL(BODYHEIGHT), 0.15 * VAL(BODYHEIGHT), 0.15 * VAL(BODYHEIGHT));
+					drawBox(1, 1, 1);
+
+					glPopMatrix();
+				}
 				glPopMatrix();
 
 			glPopMatrix();
 
+			//right arm 1
 			setAmbientColor(.1f, .1f, .1f);
 			setDiffuseColor(COLOR_RED);
 			glPushMatrix();
@@ -153,13 +186,13 @@ void Robot::draw()
 			drawSphere(0.075 * VAL(BODYHEIGHT));
 
 			setAmbientColor(.1f, .1f, .1f);
-			setDiffuseColor(COLOR_BLUE);
+			setDiffuseColor(COLOR_WHITE);
 			glRotated(-30, 0, 1, 0);
 			glRotated(VAL(RIGHTARM1X), 1, 0, 0);
 			glRotated(VAL(RIGHTARM1Y), 0, 1, 0);
 			glRotated(VAL(RIGHTARM1Z), 0, 0, 1);
 			drawCylinder(0.4 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT));
-
+			//right arm 2
 				glPushMatrix();
 				glTranslated(0, 0, 0.4 * VAL(BODYHEIGHT));
 				setAmbientColor(.1f, .1f, .1f);
@@ -167,47 +200,90 @@ void Robot::draw()
 				drawSphere(0.075 * VAL(BODYHEIGHT));
 
 				setAmbientColor(.1f, .1f, .1f);
-				setDiffuseColor(COLOR_BLUE);
+				setDiffuseColor(COLOR_WHITE);
 				glRotated(30, 0, 1, 0);
 				glRotated(VAL(RIGHTARM2X), 1, 0, 0);
 				glRotated(VAL(RIGHTARM2Y), 0, 1, 0);
 				glRotated(VAL(RIGHTARM2Z), 0, 0, 1);
 				drawCylinder(0.4 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT));
 
-					
+			//hand
+				if (VAL(HANDTYPE) == 0) {
 					glPushMatrix();
 					glTranslated(0, 0.06 * VAL(BODYHEIGHT), 0.4 * VAL(BODYHEIGHT));
 
-					setAmbientColor(.1f, .1f, .1f);
-					setDiffuseColor(COLOR_GREEN);
+
+					if (VAL(HANDCOLOR) == 0)
+						setDiffuseColor(COLOR_ORANGE);
+					else if (VAL(HANDCOLOR) == 1)
+						setDiffuseColor(COLOR_LIGHT_BLUE);
+
 					glRotated(90, 1, 0, 0);
 					drawCylinder(0.12 * VAL(BODYHEIGHT), 0.09 * VAL(BODYHEIGHT), 0.09 * VAL(BODYHEIGHT));
 
 					glPopMatrix();
+				}
+				else
+				{
+					glPushMatrix();
+					glTranslated(-0.075 * VAL(BODYHEIGHT), -0.075 * VAL(BODYHEIGHT), (0.4 - 0.075) * VAL(BODYHEIGHT));
+
+					setAmbientColor(.1f, .1f, .1f);
+					if (VAL(HANDCOLOR) == 0)
+						setDiffuseColor(COLOR_ORANGE);
+					else if (VAL(HANDCOLOR) == 1)
+						setDiffuseColor(COLOR_LIGHT_BLUE);
+
+					glScaled(0.15 * VAL(BODYHEIGHT), 0.15 * VAL(BODYHEIGHT), 0.15 * VAL(BODYHEIGHT));
+					drawBox(1, 1, 1);
+
+					glPopMatrix();
+				}
 
 
 				glPopMatrix();
 
 			glPopMatrix();
 
+			if (VAL(HEADCOLOR) == 0) {
+				setDiffuseColor(COLOR_YELLOW);
+			}
+			else {
+				setDiffuseColor(COLOR_ORANGE);
+			}
+			//neck
 			glPushMatrix();
 			glRotated(180, 1, 0, 0);
 			drawCylinder(VAL(NECKHEIGHT), 0.2 * VAL(BODYWIDTH), 0.2 * VAL(BODYWIDTH));
 
+
+			//head
+			if (VAL(HEADTYPE) == 0) {
 				glPushMatrix();
-				glTranslated(-VAL(HEADSCALE) /2.0, -VAL(HEADSCALE) / 4.0, VAL(NECKHEIGHT));
-				glScaled(VAL(HEADSCALE), VAL(HEADSCALE)/2.0, VAL(HEADSCALE)/2.0);
+				glTranslated(-VAL(HEADSCALE) / 2.0, -VAL(HEADSCALE) / 4.0, VAL(NECKHEIGHT));
+				glScaled(VAL(HEADSCALE), VAL(HEADSCALE) / 2.0, VAL(HEADSCALE) / 2.0);
 				drawBox(1, 1, 1);
 				glPopMatrix();
+			}
+			else {
+				glPushMatrix();
+				glTranslated(0, 0, VAL(NECKHEIGHT));
 
+				drawCylinder(VAL(HEADSCALE) / 2.0, VAL(HEADSCALE) / 2.0, VAL(HEADSCALE) / 2.0);
+
+				glPopMatrix();
+			}
+				
+			setDiffuseColor(COLOR_RED);
 				glPushMatrix();
 				glTranslated(0, 0, VAL(NECKHEIGHT) + VAL(HEADSCALE));
 				glScaled(0.5, 0.5, 0.5);
 				drawPentagonalBipyramid();
 				glPopMatrix();
-
+				
 			glPopMatrix();
 
+			//left leg
 			glPushMatrix();
 			glTranslated(VAL(BODYWIDTH)/2.0, 0, VAL(BODYHEIGHT));
 
@@ -216,21 +292,35 @@ void Robot::draw()
 			drawSphere(0.075 * VAL(BODYHEIGHT));
 
 			setAmbientColor(.1f, .1f, .1f);
-			setDiffuseColor(COLOR_BLUE);
+			setDiffuseColor(COLOR_WHITE);
 			glRotated(VAL(LEFTLEGX) + VAL(BOTHLEGSX), 1, 0, 0);
 			glRotated(VAL(LEFTLEGY) + VAL(BOTHLEGSY), 0, 1, 0);
 			glRotated(VAL(LEFTLEGZ) + VAL(BOTHLEGSZ), 0, 0, 1);
 			drawCylinder(0.4 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT));
-
+			//left foot
+			setAmbientColor(.1f, .1f, .1f);
+			if (VAL(FOOTCOLOR) == 0)
+				setDiffuseColor(COLOR_GREEN);
+			else if (VAL(FOOTCOLOR) == 1)
+				setDiffuseColor(COLOR_ORANGE);
+			if (VAL(FOOTTYPE) == 0) {
 				glPushMatrix();
 				glTranslated(-0.1 * VAL(BODYHEIGHT), -0.1 * VAL(BODYHEIGHT), 0.4 * VAL(BODYHEIGHT));
-				setAmbientColor(.1f, .1f, .1f);
-				setDiffuseColor(COLOR_GREEN);
+
 				drawBox(0.2 * VAL(BODYHEIGHT), 0.2 * VAL(BODYHEIGHT), 0.075 * VAL(BODYHEIGHT));
 				glPopMatrix();
+			}
+			else {
+				glPushMatrix();
+				glTranslated(0, 0, 0.4 * VAL(BODYHEIGHT));
+
+				drawCylinder(0.075 * VAL(BODYHEIGHT), 0.1 * VAL(BODYHEIGHT), 0.1 * VAL(BODYHEIGHT));
+				glPopMatrix();
+			}
 			
 			glPopMatrix();
 
+			//right leg
 			glPushMatrix();
 			glTranslated(-VAL(BODYWIDTH) / 2.0, 0, VAL(BODYHEIGHT));
 
@@ -239,24 +329,39 @@ void Robot::draw()
 			drawSphere(0.075 * VAL(BODYHEIGHT));
 
 			setAmbientColor(.1f, .1f, .1f);
-			setDiffuseColor(COLOR_BLUE);
+			setDiffuseColor(COLOR_WHITE);
 			glRotated(VAL(RIGHTLEGX) + VAL(BOTHLEGSX), 1, 0, 0);
 			glRotated(VAL(RIGHTLEGY) + VAL(BOTHLEGSY), 0, 1, 0);
 			glRotated(VAL(RIGHTLEGZ) + VAL(BOTHLEGSZ), 0, 0, 1);
 			drawCylinder(0.4 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT));
 
+			//right foot
+			setAmbientColor(.1f, .1f, .1f);
+			if (VAL(FOOTCOLOR) == 0)
+				setDiffuseColor(COLOR_GREEN);
+			else if (VAL(FOOTCOLOR) == 1)
+				setDiffuseColor(COLOR_ORANGE);
+			if (VAL(FOOTTYPE) == 0) {
 				glPushMatrix();
 				glTranslated(-0.1 * VAL(BODYHEIGHT), -0.1 * VAL(BODYHEIGHT), 0.4 * VAL(BODYHEIGHT));
-				setAmbientColor(.1f, .1f, .1f);
-				setDiffuseColor(COLOR_GREEN);
+
 				drawBox(0.2 * VAL(BODYHEIGHT), 0.2 * VAL(BODYHEIGHT), 0.075 * VAL(BODYHEIGHT));
 				glPopMatrix();
+			}
+			else {
+				glPushMatrix();
+				glTranslated(0, 0, 0.4 * VAL(BODYHEIGHT));
+				
+				drawCylinder(0.075 * VAL(BODYHEIGHT), 0.1 * VAL(BODYHEIGHT), 0.1 * VAL(BODYHEIGHT));
+				glPopMatrix();
+			}
 
 			glPopMatrix();
 
 			
 			glPushMatrix();
 
+			//tail
 			setAmbientColor(.1f, .1f, .1f);
 			setDiffuseColor(.5f, .5f, .5f);
 			glTranslated(0, -VAL(BODYWIDTH), VAL(BODYHEIGHT)/2.0f);
@@ -304,6 +409,12 @@ int main() {
 	controls[BOTHLEGSX] = ModelerControl("Both Legs X", -180, 180, 1, 0);
 	controls[BOTHLEGSY] = ModelerControl("Both Legs Y", -180, 180, 1, 0);
 	controls[BOTHLEGSZ] = ModelerControl("Both Legs Z", -180, 180, 1, 0);
+	controls[HEADTYPE] = ModelerControl("Head Type", 0, 1, 1, 0);
+	controls[HANDTYPE] = ModelerControl("Hand Type", 0, 1, 1, 0);
+	controls[FOOTTYPE] = ModelerControl("Foot Type", 0, 1, 1, 0);
+	controls[HEADCOLOR] = ModelerControl("Head Color", 0, 1, 1, 0);
+	controls[HANDCOLOR] = ModelerControl("Hand Color", 0, 1, 1, 0);
+	controls[FOOTCOLOR] = ModelerControl("Foot Color", 0, 1, 1, 0);
 	
 
 	ModelerApplication::Instance()->Init(&createRobot, controls, TOTAL);
