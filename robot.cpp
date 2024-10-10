@@ -18,6 +18,7 @@ enum RobotCtrls {
 	BOTHLEGSX, BOTHLEGSY, BOTHLEGSZ,
 	HEADTYPE, HANDTYPE, FOOTTYPE,
 	HEADCOLOR, HANDCOLOR, FOOTCOLOR,
+	LSYSSHOW, LSYSLENGTH, LSYSANGLE, LSYSDEPTH, LSYSLENGTHREDUCTION,
 	TOTAL
 };
 
@@ -38,6 +39,8 @@ public:
 		: ModelerView(x, y, w, h, label) {}
 
 	void drawPentagonalBipyramid();
+	void drawSolidTorus(GLfloat innerRadius, GLfloat outerRadius, GLint sides, GLint rings);
+	void drawLSystem(GLfloat len, GLfloat angle, GLint depth, GLfloat lenreduction );
 
 	virtual void draw();
 };
@@ -80,10 +83,35 @@ void Robot::drawPentagonalBipyramid() {
 		square1[0], square1[1], square1[2],
 		bottom[0], bottom[1], bottom[2]);
 
+}
+
+void Robot::drawLSystem(GLfloat len, GLfloat angle, GLint depth, GLfloat lenreduction) {
+	if (depth == 0) {
+		drawBox(0.1, 0.1, len);
+	}
+	else {
+		glPushMatrix();
+		drawBox(0.1, 0.1, len);
+		
+
+		glPushMatrix();
+		glTranslated(0, 0, len);
+		glRotated(angle, 1, 0, 0);
+		drawLSystem(len * lenreduction, angle, depth - 1, lenreduction);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslated(0, 0, len);
+		glRotated(-angle, 1, 0, 0);
+		drawLSystem(len * lenreduction, angle, depth - 1, lenreduction);
+		glPopMatrix();
+
+		glPopMatrix();
+	}
 
 }
 
-void drawSolidTorus(GLfloat innerRadius, GLfloat outerRadius, GLint sides, GLint rings) {
+void Robot::drawSolidTorus(GLfloat innerRadius, GLfloat outerRadius, GLint sides, GLint rings) {
 	GLfloat ringDelta = 2.0f * M_PI / rings;
 	GLfloat sideDelta = 2.0f * M_PI / sides;
 	GLfloat theta = 0.0f;
@@ -145,6 +173,23 @@ void Robot::draw()
 		glRotated(90, 1, 0, 0);
 		//body
 		drawTextureCylinder(VAL(BODYHEIGHT), VAL(BODYWIDTH), VAL(BODYWIDTH));
+
+			//tail
+			glPushMatrix();
+
+			setAmbientColor(.1f, .1f, .1f);
+			setDiffuseColor(.5f, .5f, .5f);
+			glTranslated(0, -VAL(BODYWIDTH), VAL(BODYHEIGHT) / 2.0f);
+			glRotated(90, 1, 0, 0);
+			glRotated(angleInc, 0, 0, 1);
+			drawCylinder(VAL(BODYWIDTH) * 0.25, 0.075 * VAL(BODYWIDTH), 0.075 * VAL(BODYWIDTH));
+
+			glPushMatrix();
+			glTranslated(-VAL(BODYWIDTH) * 0.075, -VAL(BODYWIDTH) * 0.25, VAL(BODYWIDTH) * 0.25);
+			drawBox(0.15 * VAL(BODYWIDTH), VAL(BODYWIDTH) * 0.5, VAL(BODYWIDTH) * 0.2);
+			glPopMatrix();
+
+			glPopMatrix();
 			
 		//left arm 1
 			setAmbientColor(.1f, .1f, .1f);
@@ -175,7 +220,7 @@ void Robot::draw()
 				glRotated(VAL(LEFTARM2Y), 0, 1, 0);
 				glRotated(VAL(LEFTARM2Z), 0, 0, 1);
 				drawCylinder(0.4 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT));
-				//hand
+				//left hand
 				if (VAL(HANDTYPE) == 0) {
 					glPushMatrix();
 					glTranslated(0, 0.06 * VAL(BODYHEIGHT), 0.4 * VAL(BODYHEIGHT));
@@ -207,6 +252,16 @@ void Robot::draw()
 
 					glPopMatrix();
 				}
+
+				if (VAL(LSYSSHOW)) {
+					setDiffuseColor(COLOR_GREEN);
+					glPushMatrix();
+					glTranslated(0, 0, 0.4 * VAL(BODYHEIGHT));
+					glRotated(-90, 1, 0, 0);
+					drawLSystem(VAL(LSYSLENGTH), VAL(LSYSANGLE), VAL(LSYSDEPTH), VAL(LSYSLENGTHREDUCTION));
+					glPopMatrix();
+				}
+
 				glPopMatrix();
 
 			glPopMatrix();
@@ -240,7 +295,7 @@ void Robot::draw()
 				glRotated(VAL(RIGHTARM2Z), 0, 0, 1);
 				drawCylinder(0.4 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT), 0.05 * VAL(BODYHEIGHT));
 
-			//hand
+			//right hand
 				if (VAL(HANDTYPE) == 0) {
 					glPushMatrix();
 					glTranslated(0, 0.06 * VAL(BODYHEIGHT), 0.4 * VAL(BODYHEIGHT));
@@ -400,25 +455,6 @@ void Robot::draw()
 
 			glPopMatrix();
 
-			
-			glPushMatrix();
-
-			//tail
-			setAmbientColor(.1f, .1f, .1f);
-			setDiffuseColor(.5f, .5f, .5f);
-			glTranslated(0, -VAL(BODYWIDTH), VAL(BODYHEIGHT)/2.0f);
-			glRotated(90, 1, 0, 0);
-			glRotated(angleInc, 0, 0, 1);
-			drawCylinder(VAL(BODYWIDTH)*0.25, 0.075 * VAL(BODYWIDTH), 0.075 * VAL(BODYWIDTH));
-
-				glPushMatrix();
-				glTranslated(-VAL(BODYWIDTH)*0.075, -VAL(BODYWIDTH) * 0.25, VAL(BODYWIDTH) * 0.25);
-				drawBox(0.15 * VAL(BODYWIDTH), VAL(BODYWIDTH)*0.5, VAL(BODYWIDTH)*0.2);
-				glPopMatrix();
-
-			glPopMatrix();
-
-
 		glPopMatrix();
 
 	glPopMatrix();
@@ -457,7 +493,11 @@ int main() {
 	controls[HEADCOLOR] = ModelerControl("Head Color", 0, 1, 1, 0);
 	controls[HANDCOLOR] = ModelerControl("Hand Color", 0, 1, 1, 0);
 	controls[FOOTCOLOR] = ModelerControl("Foot Color", 0, 1, 1, 0);
-	
+	controls[LSYSSHOW] = ModelerControl("L-System Show", 0, 1, 1, 0);
+	controls[LSYSLENGTH] = ModelerControl("L-System Length", 0.1, 1, 0.1, 0.5);
+	controls[LSYSANGLE] = ModelerControl("L-System Angle", 1, 15, 1, 5);
+	controls[LSYSDEPTH] = ModelerControl("L-System Depth", 1, 5, 1, 3);
+	controls[LSYSLENGTHREDUCTION] = ModelerControl("L-System Length Reduction", 0.5, 1, 0.1, 0.8);
 
 	ModelerApplication::Instance()->Init(&createRobot, controls, TOTAL);
 	loadTexture();
