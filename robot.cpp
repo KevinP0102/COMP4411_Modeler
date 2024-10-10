@@ -83,6 +83,39 @@ void Robot::drawPentagonalBipyramid() {
 
 }
 
+void drawSolidTorus(GLfloat innerRadius, GLfloat outerRadius, GLint sides, GLint rings) {
+	GLfloat ringDelta = 2.0f * M_PI / rings;
+	GLfloat sideDelta = 2.0f * M_PI / sides;
+	GLfloat theta = 0.0f;
+	GLfloat cosTheta = 1.0f;
+	GLfloat sinTheta = 0.0f;
+
+	for (int i = 0; i < rings; ++i) {
+		GLfloat theta1 = theta + ringDelta;
+		GLfloat cosTheta1 = cos(theta1);
+		GLfloat sinTheta1 = sin(theta1);
+
+		glBegin(GL_QUAD_STRIP);
+		GLfloat phi = 0.0f;
+		for (int j = 0; j <= sides; ++j) {
+			phi += sideDelta;
+			GLfloat cosPhi = cos(phi);
+			GLfloat sinPhi = sin(phi);
+			GLfloat dist = outerRadius + innerRadius * cosPhi;
+
+			glNormal3f(cosTheta1 * cosPhi, -sinTheta1 * cosPhi, sinPhi);
+			glVertex3f(cosTheta1 * dist, -sinTheta1 * dist, innerRadius * sinPhi);
+			glNormal3f(cosTheta * cosPhi, -sinTheta * cosPhi, sinPhi);
+			glVertex3f(cosTheta * dist, -sinTheta * dist, innerRadius * sinPhi);
+		}
+		glEnd();
+
+		theta = theta1;
+		cosTheta = cosTheta1;
+		sinTheta = sinTheta1;
+	}
+}
+
 void Robot::draw()
 {
 	ModelerView::draw();
@@ -274,11 +307,20 @@ void Robot::draw()
 				glPopMatrix();
 			}
 				
-			setDiffuseColor(COLOR_RED);
+				setDiffuseColor(COLOR_RED);
 				glPushMatrix();
 				glTranslated(0, 0, VAL(NECKHEIGHT) + VAL(HEADSCALE));
 				glScaled(0.5, 0.5, 0.5);
 				drawPentagonalBipyramid();
+				glPopMatrix();
+				
+				glPushMatrix();
+
+				setDiffuseColor(COLOR_WHITE);
+				glTranslated(0, 0, VAL(NECKHEIGHT) + VAL(HEADSCALE)-0.5);
+				drawSolidTorus(0.1, 0.5, 10, 30);
+				
+
 				glPopMatrix();
 				
 			glPopMatrix();
